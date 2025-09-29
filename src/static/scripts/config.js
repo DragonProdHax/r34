@@ -13,10 +13,16 @@ export const CONFIG = {
   transport: '/libcurl/index.mjs',
   baremod: '/baremod/index.mjs',
   unsupported: [],
+  // Optional friendly titles for specific hostnames
+  titles: [
+    { url: 'austinisd.net', title: 'Roblox' },
+  ],
   filter: [
     { url: 'neal.fun', type: 'scr' },
     { url: 'geforcenow.com', type: 'scr' },
     { url: 'spotify.com', type: 'scr' },
+    // Force plain iframe (no proxy) for Roblox via Austin ISD launch URL
+    { url: 'austinisd.net', type: 'raw' },
     ...gFilters,
   ],
 };

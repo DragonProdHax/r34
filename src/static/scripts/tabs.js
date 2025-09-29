@@ -12,6 +12,9 @@ const createIframe = (url, manager, tab, srcPrefix = '') => {
     className: manager.fCss,
     src: srcPrefix + url
   });
+  // Allow embedded sites to request storage access (cookies) and common features
+  // Ref: https://developer.mozilla.org/en-US/docs/Web/API/Storage_Access_API
+  f.allow = 'storage-access; fullscreen; autoplay; clipboard-read; clipboard-write';
   Object.assign(f.style, {
     zIndex: '10',
     opacity: '1',
@@ -22,6 +25,10 @@ const createIframe = (url, manager, tab, srcPrefix = '') => {
 };
 
 export const TYPE = {
+  raw: {
+    create: (url, manager, tab) => createIframe(url, manager, tab),
+    navigate: (url, manager, tab, iframe) => iframe && (iframe.src = url),
+  },
   scr: {
     create: (url, manager, tab) => {
       const sf = scr.createFrame();
@@ -29,6 +36,8 @@ export const TYPE = {
       const frame = sf.frame;
       frame.id = `iframe-${tab.id}`;
       frame.className = manager.fCss;
+      // Ensure same permissions on scramjet-created frames
+      frame.allow = 'storage-access; fullscreen; autoplay; clipboard-read; clipboard-write';
       frame.style.zIndex = 10;
       frame.style.opacity = '1';
       frame.style.pointerEvents = 'auto';
@@ -123,13 +132,19 @@ class TabManager {
     };
 
     if (this.ui) {
-      this.ui.value = this.isNewTab(this.tabs[0].url) ? '' : this.tabs[0].url;
+      this.ui.value = this.isNewTab(this.tabs[0].url)
+        ? ''
+        : (this.friendlyTitle(this.tabs[0].url) ? '' : this.tabs[0].url);
       this.ui.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
           const val = this.ui.value.trim();
           this.updateUrl(val);
-          if (val !== 'tabs://new') this.ui.value = this.formatInputUrl(val);
+          if (val !== 'tabs://new') {
+            const formatted = this.formatInputUrl(val);
+            const forced = this.friendlyTitle(formatted);
+            this.ui.value = forced ? '' : formatted;
+          }
           this.ui.blur();
         }
       });
@@ -190,6 +205,14 @@ class TabManager {
     } catch {
       return this.newTabTitle;
     }
+  };
+
+  friendlyTitle = (url) => {
+    try {
+      const host = new URL(url).hostname.replace('www.', '');
+      const match = (CONFIG.titles || []).find(t => host.includes(t.url));
+      return match?.title || null;
+    } catch { return null; }
   };
 
   isNewTab = (url) => url === this.newTabUrl;
@@ -260,7 +283,10 @@ class TabManager {
       const handler = TYPE[this.prType] || TYPE.auto;
       const iframe = document.getElementById(`iframe-${activeTab.id}`);
       handler.navigate(decodedUrl, this, activeTab, iframe);
-      if (this.ui) this.ui.value = decodedUrl;
+      if (this.ui) {
+        const forced = this.friendlyTitle(decodedUrl);
+        this.ui.value = forced ? '' : decodedUrl;
+      }
       console.log('[info] back(): navigated to', decodedUrl);
     }
   };
@@ -281,7 +307,10 @@ class TabManager {
       const handler = TYPE[this.prType] || TYPE.auto;
       const iframe = document.getElementById(`iframe-${activeTab.id}`);
       handler.navigate(decodedUrl, this, activeTab, iframe);
-      if (this.ui) this.ui.value = decodedUrl;
+      if (this.ui) {
+        const forced = this.friendlyTitle(decodedUrl);
+        this.ui.value = forced ? '' : decodedUrl;
+      }
       console.log('[info] forward(): navigated to', decodedUrl);
     }
   };
@@ -346,6 +375,12 @@ class TabManager {
     t.url = newUrl;
     
     const updateTitle = (tries = 10) => {
+      const forced = this.friendlyTitle(newUrl);
+      if (forced) {
+        t.title = forced;
+        this.render();
+        return;
+      }
       const ttl = f.contentDocument?.title?.trim();
       if (ttl) {
         t.title = ttl.length > 20 ? ttl.slice(0, 20) + '...' : ttl;
@@ -361,7 +396,12 @@ class TabManager {
     updateTitle();
     
     if (t.active && this.ui && t.url !== this.newTabUrl) {
-      this.ui.value = decodedUrl;
+      // Do not stomp the user's caret/selection while they are typing in the URL input
+      const isFocused = document.activeElement === this.ui;
+      if (!isFocused) {
+        const forced = this.friendlyTitle(newUrl);
+        this.ui.value = forced ? '' : decodedUrl;
+      }
       this.showBg(false);
     }
   };
@@ -407,7 +447,11 @@ class TabManager {
     this.showActive();
     if (this.ui) {
       const activeTab = this.active();
-      this.ui.value = activeTab && !this.isNewTab(activeTab.url) ? this.ex(activeTab.url) : '';
+      if (activeTab && !this.isNewTab(activeTab.url)) {
+        const decoded = this.ex(activeTab.url);
+        const forced = this.friendlyTitle(decoded);
+        this.ui.value = forced ? '' : decoded;
+      } else this.ui.value = '';
     }
   };
 
@@ -449,9 +493,19 @@ class TabManager {
     } else handler.navigate(url, this, t, f);
 
     t.url = url;
-    try { t.title = new URL(url).hostname.replace('www.', ''); } catch { t.title = input; }
+    const forced = this.friendlyTitle(url);
+    if (forced) {
+      t.title = forced;
+    } else {
+      try { t.title = new URL(url).hostname.replace('www.', ''); } catch { t.title = input; }
+    }
     this.showActive();
     this.render();
+    // Mask URL bar if friendly title applies
+    if (this.ui) {
+      const forced2 = this.friendlyTitle(url);
+      if (forced2) this.ui.value = '';
+    }
   };
 
   getTabWidth = () => {
