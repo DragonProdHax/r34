@@ -1,6 +1,12 @@
  services:
   - type: web
-    name: educational-website
+    name: educational-platform
     env: node
     plan: free
-    startCommand: npm install && npm build && node server.js
+    buildCommand: npm install && npm run build
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        fromService: true
