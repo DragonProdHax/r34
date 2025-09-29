@@ -1,47 +1,26 @@
 services:
-  - type: web
-    name: r34-proxy
-    env: node
-    plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npm start
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        fromService:
-          type: web
-          name: r34-proxy
-          property: port
-    healthCheckPath: /
-    disk:
-      name: r34-proxy-disk
-      mountPath: /opt/render/project/src/data
-      sizeGB: 1
-    autoDeploy: true
-    branch: main
-    rootDir: .
-    
-  # Static site service (alternative deployment option)
   - type: static_site
-    name: r34-proxy-static
+    name: web-portal
     env: static
     plan: free
     buildCommand: npm install && npm run build
     publishPath: ./dist
-    pullRequestPreviewsEnabled: true
+    pullRequestPreviewsEnabled: false
     branch: main
     rootDir: .
     headers:
       - path: /*
         name: X-Frame-Options
-        value: DENY
+        value: SAMEORIGIN
       - path: /*
         name: X-Content-Type-Options
         value: nosniff
       - path: /*
         name: Referrer-Policy
         value: strict-origin-when-cross-origin
+      - path: /*
+        name: Content-Security-Policy
+        value: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
     routes:
       - type: rewrite
         source: /*
