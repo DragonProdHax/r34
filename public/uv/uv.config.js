@@ -1,4 +1,4 @@
-const k = new TextEncoder().encode(btoa(new Date().toISOString().slice(0, 10) + location.host).split('').reverse().join('').slice(6.7));
+const k = new TextEncoder().encode(btoa(new Date().toISOString().slice(0, 10) + location.host).split('').reverse().join('').slice(6, 7));
 self.__uv$config = {
     prefix: "/uv/service/",
     encodeUrl: s => {
