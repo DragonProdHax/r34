@@ -1,12 +1,4 @@
 {
-  "functions": {
-    "api/wisp.js": {
-      "runtime": "nodejs20.x"
-    },
-    "api/bare.js": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "rewrites": [
     {
       "source": "/uv/(.*)",
