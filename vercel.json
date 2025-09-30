@@ -13,6 +13,10 @@
       "destination": "/public/libcurl/$1"
     },
     {
+      "source": "/scram/service/(.*)",
+      "destination": "/api/bare"
+    },
+    {
       "source": "/scram/(.*)",
       "destination": "/public/scram/$1"
     },
