@@ -137,15 +137,30 @@
         transition: background-color 0.1s ease-in;
       }
     </style>
-    <script src="/baremux/index.js" defer></script>
-    <script src="/libcurl/index.mjs" defer></script>
-    <script src="/scram/scramjet.config.js" defer></script>
-    <script src="/scram/scramjet.all.js" defer></script>
-    <script src="/uv/uv.config.js" defer></script>
+    <script src="/baremux/index.js"></script>
+    <script src="/libcurl/index.mjs"></script>
+    <script src="/scram/scramjet.config.js"></script>
+    <script src="/scram/scramjet.all.js"></script>
+    <script src="/uv/uv.config.js"></script>
     <script>
+      // Initialize Scramjet properly
+      const { ScramjetController } = $scramjetLoadController();
+      const scramjet = new ScramjetController({
+        files: {
+          wasm: "/scram/scramjet.wasm.wasm",
+          all: "/scram/scramjet.all.js",
+          sync: "/scram/scramjet.sync.js",
+        }
+      });
+      scramjet.init();
+      
+      // Register service worker
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/scram/scramjet.sw.js', { scope: '/scram/service/' });
       }
+      
+      // Initialize BareMux
+      const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
     </script>
   </head>
 
