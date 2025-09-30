@@ -30,7 +30,7 @@
     },
     {
       "src": "/assets/(.*)",
-      "dest": "/assets/$1"
+      "dest": "/public/assets/$1"
     },
     {
       "src": "/(.*)",
@@ -68,7 +68,7 @@
     },
     {
       "source": "/assets/(.*)",
-      "destination": "/assets/$1"
+      "destination": "/public/assets/$1"
     }
   ]
 }
