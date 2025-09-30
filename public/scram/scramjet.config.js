@@ -1,4 +1,4 @@
-export default {
+self.__scramjet$config = {
 	prefix: "/scram/service/",
 	codec: "xor",
 	config: "/scram/scramjet.config.js",

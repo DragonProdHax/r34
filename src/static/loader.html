@@ -138,9 +138,15 @@
       }
     </style>
     <script src="/baremux/index.js" defer></script>
-    <script src="/libcurl/index.js" defer></script>
+    <script src="/libcurl/index.mjs" defer></script>
+    <script src="/scram/scramjet.config.js" defer></script>
     <script src="/scram/scramjet.all.js" defer></script>
     <script src="/uv/uv.config.js" defer></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/scram/scramjet.sw.js', { scope: '/scram/service/' });
+      }
+    </script>
   </head>
 
   <body>
