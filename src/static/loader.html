@@ -172,9 +172,9 @@
       // Initialize BareMux with public bare server
       const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
       // Use public bare server since Vercel doesn't support hosting bare servers
-      await connection.setTransport("/epoxy/index.mjs", ["https://uv.holyubofficial.net/"]);
+      await connection.setTransport("/epoxy/index.mjs", ["https://tomp.app/"]);
       
-      console.log('Proxy initialized with Epoxy transport');
+      console.log('Proxy initialized with Epoxy transport using tomp.app bare server');
     </script>
   </head>
 
