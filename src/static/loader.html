@@ -142,18 +142,35 @@
     <script src="/scram/scramjet.all.js"></script>
     <script src="/uv/uv.config.js"></script>
     <script type="module">
-      // Clear old service workers first
+      // Force complete cache and service worker cleanup
       if ('serviceWorker' in navigator) {
+        // Unregister ALL service workers
         const registrations = await navigator.serviceWorker.getRegistrations();
         for (let registration of registrations) {
           await registration.unregister();
         }
-        // Clear all caches
+        
+        // Clear ALL caches
         const cacheNames = await caches.keys();
         await Promise.all(cacheNames.map(name => caches.delete(name)));
+        
+        // Clear localStorage for bare-mux
+        localStorage.removeItem('bare-mux-path');
+        localStorage.removeItem('bare-mux-transport');
+        
+        // Clear IndexedDB
+        const databases = await indexedDB.databases();
+        databases.forEach(db => indexedDB.deleteDatabase(db.name));
       }
       
-      // Initialize Scramjet properly
+      // Wait a moment for cleanup
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Initialize BareMux FIRST with public bare server
+      const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
+      await connection.setTransport("/epoxy/index.mjs", ["https://tomp.app/"]);
+      
+      // Initialize Scramjet
       const { ScramjetController } = $scramjetLoadController();
       const scramjet = new ScramjetController({
         files: {
@@ -164,17 +181,12 @@
       });
       await scramjet.init();
       
-      // Register service worker
+      // Register NEW service worker
       if ('serviceWorker' in navigator) {
-        await navigator.serviceWorker.register('/scram/scramjet.sw.js', { scope: '/scram/service/' });
+        await navigator.serviceWorker.register('/scram/scramjet.sw.js', { scope: '/scram/service/', updateViaCache: 'none' });
       }
       
-      // Initialize BareMux with public bare server
-      const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
-      // Use public bare server since Vercel doesn't support hosting bare servers
-      await connection.setTransport("/epoxy/index.mjs", ["https://tomp.app/"]);
-      
-      console.log('Proxy initialized with Epoxy transport using tomp.app bare server');
+      console.log('✅ Proxy initialized with Epoxy transport using tomp.app');
     </script>
   </head>
 

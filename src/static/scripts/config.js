@@ -8,9 +8,9 @@ const gFilters = (apps.games || [])
   }));
 
 export const CONFIG = {
-  bUrl: '/seal/',
+  bUrl: 'https://tomp.app/',
   ws: `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/wisp/`,
-  transport: '/libcurl/index.mjs',
+  transport: '/epoxy/index.mjs',
   baremod: '/baremod/index.mjs',
   unsupported: [],
   // Optional friendly titles for specific hostnames
