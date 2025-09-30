@@ -159,8 +159,9 @@
         navigator.serviceWorker.register('/scram/scramjet.sw.js', { scope: '/scram/service/' });
       }
       
-      // Initialize BareMux
+      // Initialize BareMux and set transport
       const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
+      connection.setTransport("/libcurl/index.mjs", [{ wisp: `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/wisp/` }]);
     </script>
   </head>
 
