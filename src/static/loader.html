@@ -138,11 +138,10 @@
       }
     </style>
     <script src="/baremux/index.js"></script>
-    <script src="/baremux/bare.js"></script>
     <script src="/scram/scramjet.config.js"></script>
     <script src="/scram/scramjet.all.js"></script>
     <script src="/uv/uv.config.js"></script>
-    <script>
+    <script type="module">
       // Initialize Scramjet properly
       const { ScramjetController } = $scramjetLoadController();
       const scramjet = new ScramjetController({
@@ -159,10 +158,10 @@
         navigator.serviceWorker.register('/scram/scramjet.sw.js', { scope: '/scram/service/' });
       }
       
-      // Initialize BareMux and set transport (use HTTP bare server instead of WebSocket)
+      // Initialize BareMux with public bare server
       const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
-      // Use bare client transport since Vercel doesn't support WebSockets
-      connection.setTransport("/baremux/bare.js", ["/seal/"]);
+      // Use public bare server since Vercel doesn't support hosting bare servers
+      await connection.setTransport("/epoxy/index.mjs", ["https://uv.holyubofficial.net/"]);
     </script>
   </head>
 

@@ -9,8 +9,8 @@
       "destination": "/public/baremux/$1"
     },
     {
-      "source": "/libcurl/(.*)",
-      "destination": "/public/libcurl/$1"
+      "source": "/epoxy/(.*)",
+      "destination": "/public/epoxy/$1"
     },
     {
       "source": "/scram/service/(.*)",
