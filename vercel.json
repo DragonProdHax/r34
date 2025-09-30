@@ -1,42 +1,4 @@
 {
-  "routes": [
-    {
-      "src": "/uv/(.*)",
-      "dest": "/public/uv/$1"
-    },
-    {
-      "src": "/baremux/(.*)",
-      "dest": "/public/baremux/$1"
-    },
-    {
-      "src": "/libcurl/(.*)",
-      "dest": "/public/libcurl/$1"
-    },
-    {
-      "src": "/scram/(.*)",
-      "dest": "/public/scram/$1"
-    },
-    {
-      "src": "/wisp/(.*)",
-      "dest": "/api/wisp"
-    },
-    {
-      "src": "/seal/(.*)",
-      "dest": "/api/bare"
-    },
-    {
-      "src": "/src/(.*)",
-      "dest": "/src/$1"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/public/assets/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
   "functions": {
     "api/wisp.js": {
       "runtime": "nodejs18.x"
@@ -61,6 +23,14 @@
     {
       "source": "/scram/(.*)",
       "destination": "/public/scram/$1"
+    },
+    {
+      "source": "/wisp/(.*)",
+      "destination": "/api/wisp"
+    },
+    {
+      "source": "/seal/(.*)",
+      "destination": "/api/bare"
     },
     {
       "source": "/src/(.*)",
