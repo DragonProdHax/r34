@@ -21,10 +21,6 @@
       "destination": "/public/scram/$1"
     },
     {
-      "source": "/wisp/(.*)",
-      "destination": "/api/wisp"
-    },
-    {
       "source": "/seal/(.*)",
       "destination": "/api/bare"
     },
